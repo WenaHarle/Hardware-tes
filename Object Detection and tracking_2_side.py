@@ -1,7 +1,5 @@
 import cv2
-import numpy as np
 import math
-import csv
 import xgboost as xgb
 import pandas as pd
 
@@ -12,10 +10,10 @@ model = xgb.Booster()
 model.load_model("xgboost_model2.model")
 
 # Baca video
-video_top = '/Hasil 2/Camera_B_1.mp4'
+video_top = 'Camera_B_2.mp4'
 cap = cv2.VideoCapture(video_top)
 
-video_side = '/Hasil 2/Camera_A_1.mp4'
+video_side = 'Camera_A_2.mp4'
 cap2 = cv2.VideoCapture(video_side)
 
 count = 0
@@ -42,8 +40,8 @@ while cap.isOpened():
     gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(result2, cv2.COLOR_BGR2GRAY)
 
-    contours, hierarchy = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    contours2, hierarchy2 = cv2.findContours(gray2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _,contours, hierarchy = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _,contours2, hierarchy2 = cv2.findContours(gray2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
 
 
