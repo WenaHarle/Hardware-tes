@@ -3,12 +3,6 @@ import math
 import xgboost as xgb
 import pandas as pd
 
-from segmentation import segment
-
-
-model = xgb.Booster()
-model.load_model("xgboost_model2.model")
-
 # Baca video
 video_top = 'Camera_B_2.mp4'
 cap = cv2.VideoCapture(video_top)
