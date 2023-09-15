@@ -1,14 +1,19 @@
 import cv2
+import numpy as np
 import math
+import csv
 import xgboost as xgb
 import pandas as pd
 
-# Baca video
-video_top = 'Camera_B_2.mp4'
-cap = cv2.VideoCapture(video_top)
+from segmentation import segment
 
-video_side = 'Camera_A_2.mp4'
-cap2 = cv2.VideoCapture(video_side)
+
+model = xgb.Booster()
+model.load_model("xgboost_model2.model")
+
+# Baca video
+cap = cv2.VideoCapture(1)
+cap2 = cv2.VideoCapture(2)
 
 count = 0
 midold = []
@@ -22,7 +27,7 @@ while cap.isOpened():
     count += 1
     ret, frame = cap.read()
     _, frame2 = cap2.read()
-    frame2 = frame2[200:800, 600:1200]
+
     if not ret:
         break
     # Ubah ruang warna BGR ke HSVC
@@ -34,15 +39,15 @@ while cap.isOpened():
     gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(result2, cv2.COLOR_BGR2GRAY)
 
-    _,contours, hierarchy = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    _,contours2, hierarchy2 = cv2.findContours(gray2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, hierarchy = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours2, hierarchy2 = cv2.findContours(gray2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
 
 
     for cnt2 in contours2:
         # Calculate area and remove small elements
         area2 = cv2.contourArea(cnt2)
-        if area2 > 15000:
+        if area2 > 3000:
             x2, y2, w2, h2 = cv2.boundingRect(cnt2)
             cv2.rectangle(frame2, (x2, y2), (x2 + w2, y2 + h2), (0, 0, 225), 3)
             cv2.putText(frame2, str(w2 * h2), (x2, y2 + h2), cv2.FONT_HERSHEY_PLAIN, 5, (0, 255, 0), 5)
@@ -51,14 +56,17 @@ while cap.isOpened():
     for cnt in contours:
             # Calculate area and remove small elements
         area = cv2.contourArea(cnt)
-        if area > 100000 and area < 380000:
+        if area > 10000:
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 225), 3)
             cx = int((x + x + w) / 2)
             cy = int((y + y + h) / 2)
 
+            ww = int(w*(1080/480))
+            hh = int(h*(1080/480))
+            tt = int(t*(1080/480))
 
-            new_data = pd.DataFrame({'width': [w], 'height': [h], 'tall' : [t]})
+            new_data = pd.DataFrame({'width': [ww], 'height': [hh], 'tall' : [tt]})
             prediction = model.predict(xgb.DMatrix(new_data))[0]
             if prediction == 0.0:
                 grade = 'A'
