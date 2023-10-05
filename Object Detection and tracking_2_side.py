@@ -4,7 +4,7 @@ import xgboost as xgb
 import pandas as pd
 
 from segmentation import segment
-
+url = 'http://192.168.1.107/push/push.php'
 
 model = xgb.Booster()
 model.load_model("xgboost_model2.model")
@@ -114,10 +114,14 @@ while cap.isOpened():
         if (object_id not in cid and 510 < pt[1] and pt[1] < 530):
             buah =+1
             cid.append(object_id)
+            data = {'grade': grade}
+            response = requests.get(url, params=data)
+
 
         if (pt[1] == 540 and buah % 3 == 0):
             if cid: 
                 cid.pop(0)
+                
 
 
     midold = midnow.copy()
